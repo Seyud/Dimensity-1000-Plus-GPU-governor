@@ -13,6 +13,7 @@ print_module_info() {
     echo "• 修改频率表后需重启手机生效"
     echo "• 模块将在开机60秒后生效"
     echo "• 如遇死机问题，可在重启后及时禁用模块"
+    echo "• 运行日志位于 /data/local/tmp/gpu_scheduler.log"
     echo
     echo "------------------ 适用场景说明 ------------------"
     echo "• 此模块用于优化天玑1000+ GPU的高频功耗"
