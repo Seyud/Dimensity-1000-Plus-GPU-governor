@@ -135,21 +135,25 @@ create_config_file() {
     if [[ ! -f $freq_table ]]; then
         if [[ "$soc" == "mt6885" ]] || [[ "$soc" == "mt6889" ]]; then
             get_preset_config > $freq_table
-            echo
-            echo "警告：默认配置可能导致以下问题："
-            echo "• 配置不生效"
-            echo "• 系统死机"
-            echo "• 屏幕闪烁"
-            echo "• 突发卡顿"
-            echo
-            echo "建议："
-            echo "1. 如果出现花屏，请降低每档电压对应的频率"
-            echo "2. 如果压力测试正常但日常使用死机，建议将DDR_OPP设为999"
-            echo
-        else
+            else
             echo "未找到可用预设，请参考示例自行配置"
             echo -e "# Freq Volt DDR_OPP\n# 示例配置(不要包含#号)\n#852000 61250 3" > $freq_table
         fi
+    fi
+    
+    # 无论是否存在配置文件都显示警告信息
+    if [[ "$soc" == "mt6885" ]] || [[ "$soc" == "mt6889" ]]; then
+        echo
+        echo "警告：默认配置可能导致以下问题："
+        echo "• 配置不生效"
+        echo "• 系统死机"
+        echo "• 屏幕闪烁"
+        echo "• 突发卡顿"
+        echo
+        echo "建议："
+        echo "1. 如果出现花屏，请降低每档电压对应的频率"
+        echo "2. 如果压力测试正常但日常使用死机，建议将DDR_OPP设为999"
+        echo
     fi
 }
 
