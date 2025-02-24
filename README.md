@@ -25,7 +25,7 @@
 1. 通过root管理器刷入模块
 2. 重启设备
 3. 等待60秒服务自启
-4. 查看日志：`adb shell cat /data/local/tmp/gpu_scheduler.log`
+4. 查看日志：`adb shell cat $MODDIR/gpu_governor.log`
 
 ## ⚙️ 配置指南
 配置文件路径：`/data/gpu_freq_table.conf`
@@ -41,7 +41,7 @@ Freq Volt DDR_OPP
 1. 花屏问题：降低当前电压档位的频率
 2. 日常死机：设置DDR_OPP=999
 3. 性能不足：提升margin值（5-10%逐步调整）
-4. 功耗优化：降低高频段电压（每次50uv递减）
+4. 功耗优化：降低高频段电压（每次625uv递减）
 
 ## 🛠️ 技术原理
 A[系统启动] --> B[加载频率表]
@@ -55,7 +55,7 @@ G --> H[应用新电压]
 
 ## 📚 常见问题
 **Q：模块不生效怎么办？**  
-A：检查`/data/local/tmp/gpu_scheduler.log`错误日志
+A：检查`$MODDIR/gpu_governor.log`错误日志
 
 **Q：如何恢复默认配置？**  
 A：删除`/data/gpu_freq_table.conf`后重启
