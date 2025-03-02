@@ -25,7 +25,7 @@
 1. 通过root管理器刷入模块
 2. 重启设备
 3. 等待60秒服务自启
-4. 查看日志：`adb shell cat $MODDIR/gpu_governor.log`
+4. 查看日志：`adb shell cat /data/adb/modules/dimensity_hybrid_governor/gpu_governor.log`
 
 ## ⚙️ 配置指南
 配置文件路径：`/data/gpu_freq_table.conf`
@@ -55,7 +55,7 @@ G --> H[应用新电压]
 
 ## 📚 常见问题
 **Q：模块不生效怎么办？**  
-A：检查`$MODDIR/gpu_governor.log`错误日志
+A：检查`/data/adb/modules/dimensity_hybrid_governor/gpu_governor.log`错误日志
 
 **Q：如何恢复默认配置？**  
 A：删除`/data/gpu_freq_table.conf`后重启
