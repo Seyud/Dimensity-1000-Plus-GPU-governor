@@ -55,7 +55,7 @@ G --> H[应用新电压]
 
 ## 📚 常见问题
 **Q：模块不生效怎么办？**  
-A：检查`/data/adb/modules/dimensity_hybrid_governor/gpu_governor.log`错误日志
+A：检查`/data/adb/modules/dimensity_hybrid_governor/gpu_governor.log`错误日志，并发送给开发者寻求帮助
 
 **Q：如何恢复默认配置？**  
 A：删除`/data/gpu_freq_table.conf`后重启
