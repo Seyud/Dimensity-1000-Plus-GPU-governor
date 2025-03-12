@@ -9,7 +9,6 @@
 ## 📌 功能特性
 - 🚀 动态GPU频率调节算法
 - 🔋 智能功耗管理（高频场景节能15-30%）
-- 🎮 游戏场景专项优化
 - 📊 可自定义的频率/电压表
 - ⚡ 自动内存频率调节（DDR_OPP）
 - 📈 实时性能余量控制（百分比/MHz双模式）
@@ -25,7 +24,7 @@
 1. 通过root管理器刷入模块
 2. 重启设备
 3. 等待60秒服务自启
-4. 查看日志：`adb shell cat /data/adb/modules/dimensity_hybrid_governor/gpu_governor.log`
+4. 查看日志：`/data/adb/modules/dimensity_hybrid_governor/gpu_governor.log`
 
 ## ⚙️ 配置指南
 配置文件路径：`/data/gpu_freq_table.conf`
