@@ -1,4 +1,4 @@
-# Dimensity-1000+ GPU Governor v1.4.6
+# Dimensity-1000+ GPU Governor 
 
 [![Magisk](https://img.shields.io/badge/Magisk-20.4%2B-brightgreen)](https://github.com/topjohnwu/Magisk)
 ![Platform](https://img.shields.io/badge/Platform-Android%2010.0%2B-blue)
