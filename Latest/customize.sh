@@ -19,15 +19,28 @@ echo
 set_perm_recursive $MODPATH 0 0 0755 0644
 set_perm_recursive $MODPATH/gpu-scheduler 0 0 0755 0755
 
-if [[ "$soc" != "mt6885" ]] && [[ "$soc" != "mt6889" ]]; then
-  echo
-  echo
-  echo "此模块仅适用于天玑1000+"
-  echo
-  echo
+# SOC兼容性检查函数
+check_soc_compatibility() {
+  if [[ "$soc" != "mt6885" ]] && [[ "$soc" != "mt6889" ]]; then
+    echo
+    echo
+    echo "此模块仅适用于天玑1000+"
+    echo
+    echo
 
-  exit 2
-fi
+    exit 2
+  fi
+
+  log_info "SOC型号: $soc, 兼容性检查通过"
+}
+
+# 获取系统信息函数
+get_system_info() {
+  log_info "设备型号: $(getprop ro.product.model)"
+  log_info "Android版本: $(getprop ro.build.version.release)"
+  log_info "内核版本: $(uname -r)"
+  log_info "SOC型号: $(getprop ro.hardware)"
+}
 
 volt_list="65000 64375 63750 63125 62500 61875 61875 61250 60625 60000 59375 58750 58125 57500 56875 56250 55625 55000 54375 53750 53125 52500 51875 51250 50625 50000 49375 48750 48125 47500 46875 46250 45625 45000 44375 43750 43125 42500 41875"
 
@@ -109,7 +122,7 @@ preset_config() {
 create_freq_table() {
   if [[ ! -f $freq_table ]]; then
     preset_config "$soc" > $freq_table
-    
+
     if [[ "$soc" == "mt6885" ]] || [[ "$soc" == "mt6889" ]]; then
       print_config_warning
     else
@@ -131,43 +144,26 @@ print_config_warning() {
 EOF
 }
 
-# 优化4: 主流程优化
-# 添加日志系统
-LOG_FILE="$MODPATH/gpu_governor.log"
-MAX_LOG_SIZE = 524288  # 512KB
+# 将日志工具库复制到模块目录
+cp -f "$TMPDIR/log_utils.sh" "$MODPATH/log_utils.sh"
+cp -f "$TMPDIR/log_manager.sh" "$MODPATH/log_manager.sh"
+chmod 755 "$MODPATH/log_utils.sh" "$MODPATH/log_manager.sh"
 
-log_init() {
-  touch "$LOG_FILE"
-  echo "=== GPU Governor Log $(date '+%Y-%m-%d %H:%M:%S') ===" > "$LOG_FILE"
-  log_info "模块初始化开始"
-}
-
-log_info() {
-  echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
-}
-
-log_error() {
-  echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
-}
-
-log_rotate() {
-  if [ -f "$LOG_FILE" ] && [ $(stat -f %z "$LOG_FILE") -gt $MAX_LOG_SIZE ]; then
-    mv "$LOG_FILE" "${LOG_FILE}.old"
-  fi
-}
+# 引入日志工具库
+source "$TMPDIR/log_utils.sh"
 
 # 在 main 函数中添加日志
 main() {
   log_init
   log_info "检测SOC兼容性"
   check_soc_compatibility
-  
+
   log_info "获取系统信息"
   get_system_info
-  
+
   log_info "创建频率表"
   create_freq_table
-  
+
   log_info "模块初始化完成\n"
 }
 
