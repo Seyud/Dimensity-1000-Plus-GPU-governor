@@ -1,4 +1,4 @@
-# Dimensity-1000+ GPU Governor
+# Dimensity-1000+ GPU Governor v1.4.7
 
 [![Magisk](https://img.shields.io/badge/Magisk-20.4%2B-brightgreen)](https://github.com/topjohnwu/Magisk)
 ![Platform](https://img.shields.io/badge/Platform-Android%2010.0%2B-blue)
@@ -145,9 +145,3 @@ A：使用日志管理工具轮转或压缩日志：`sh /data/adb/modules/dimens
 
 **Q：控制面板无法启动怎么办？**
 A：检查文件权限：`chmod 755 /data/adb/modules/dimensity_hybrid_governor/action.sh`
-
-**Q：为什么游戏反而卡顿？**
-A：尝试提高margin值或检查DDR_OPP设置
-
-**Q：日志文件过大怎么办？**
-A：使用日志管理工具轮转或压缩日志：`sh /data/adb/modules/dimensity_hybrid_governor/log_manager.sh rotate`
