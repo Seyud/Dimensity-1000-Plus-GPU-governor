@@ -18,6 +18,7 @@ GPU dynamic governor for MediaTek Dimensity 1000+, optimizing power consumption 
 - 📊 Customizable frequency/voltage table
 - ⚡ Automatic memory frequency adjustment (DDR_OPP)
 - 📈 Real-time performance margin control (percentage/MHz dual mode)
+- 🔄 Dual governor modes (hybrid/simple) for different usage scenarios
 - 📝 Comprehensive log management system (automatic rotation, compression, and level control)
 - 🛠️ Command-line log management tools
 - 🖥️ Interactive control panel
@@ -41,7 +42,17 @@ GPU dynamic governor for MediaTek Dimensity 1000+, optimizing power consumption 
 ## ⚙️ Configuration Guide
 Configuration file path: `/data/gpu_freq_table.conf`
 
-### Configuration Example
+### Configuration Options
+#### Governor Mode
+```
+# Governor mode configuration
+# Options: hybrid or simple, default is hybrid
+# simple: only uses frequencies defined in gpu_freq_table.conf
+# hybrid: pauses auxiliary governor during low performance demand to reduce power consumption
+governor=hybrid
+```
+
+#### Frequency/Voltage Table
 Freq Volt DDR_OPP
 218000 43750 999
 280000 46875 999
@@ -156,6 +167,9 @@ A: Use the WebUI interface, command-line control panel, or directly execute: `sh
 
 **Q: How to restore default configuration?**
 A: Delete `/data/gpu_freq_table.conf` and restart
+
+**Q: How to switch between governor modes?**
+A: Edit the `/data/gpu_freq_table.conf` file, change `governor=hybrid` to `governor=simple` or vice versa, then restart your device
 
 **Q: Does it support other SOCs?**
 A: Limited to Dimensity 1000+ (mt6885/mt6889)

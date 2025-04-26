@@ -17,6 +17,7 @@
 - 📊 可自定义的频率/电压表
 - ⚡ 自动内存频率调节（DDR_OPP）
 - 📈 实时性能余量控制（百分比/MHz双模式）
+- 🔄 双模式调速器（hybrid/simple）支持不同场景需求
 - 📝 完善的日志管理系统（自动轮转、压缩和级别控制）
 - 🛠️ 命令行日志管理工具
 - 🖥️ 交互式控制面板
@@ -39,7 +40,17 @@
 ## ⚙️ 配置指南
 配置文件路径：`/data/gpu_freq_table.conf`
 
-### 配置示例
+### 配置选项
+#### 调速模式（governor）
+```
+# 配置项：调速模式
+# 可配置为 hybrid simple , 默认 hybrid
+# simple 仅使用gpu_freq_table.conf中定义的频率
+# hybrid 在性能需求较低时暂停辅助调速器以降低功耗
+governor=hybrid
+```
+
+#### 频率/电压表
 Freq Volt DDR_OPP
 218000 43750 999
 280000 46875 999
@@ -143,6 +154,9 @@ A：使用WebUI界面、命令行控制面板或直接执行：`sh /data/adb/mod
 
 **Q：如何恢复默认配置？**
 A：删除`/data/gpu_freq_table.conf`后重启
+
+**Q：如何切换调速模式？**
+A：编辑`/data/gpu_freq_table.conf`文件，修改`governor=hybrid`为`governor=simple`或反之，然后重启设备
 
 **Q：支持其他SOC吗？**
 A：仅限天玑1000+（mt6885/mt6889）
