@@ -1,0 +1,208 @@
+/* GPU配置页面样式 */
+
+.gpu-config-page {
+    padding: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.config-description {
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.config-editor-container {
+    margin-bottom: 24px;
+    border: 1px solid var(--divider);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.config-editor-header {
+    padding: 8px 16px;
+    background-color: var(--surface-variant);
+    color: var(--on-surface-variant);
+    font-weight: 500;
+    border-bottom: 1px solid var(--divider);
+}
+
+.config-editor {
+    width: 100%;
+    min-height: 300px;
+    padding: 16px;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    border: none;
+    background-color: var(--surface);
+    color: var(--on-surface);
+    resize: vertical;
+}
+
+.config-help {
+    border: 1px solid var(--divider);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.config-help-header {
+    padding: 8px 16px;
+    background-color: var(--surface-variant);
+    color: var(--on-surface-variant);
+    font-weight: 500;
+    border-bottom: 1px solid var(--divider);
+}
+
+.config-help-content {
+    padding: 16px;
+    background-color: var(--surface);
+    color: var(--on-surface);
+}
+
+.config-help-content h3 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--primary);
+}
+
+.config-help-content h3:first-child {
+    margin-top: 0;
+}
+
+.config-help-content p {
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.config-help-content ul {
+    margin-bottom: 16px;
+    padding-left: 24px;
+}
+
+.config-help-content li {
+    margin-bottom: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.chip-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.chip {
+    display: inline-block;
+    padding: 4px 12px;
+    background-color: var(--surface-variant);
+    color: var(--on-surface-variant);
+    border-radius: 16px;
+    font-size: 12px;
+    font-family: monospace;
+}
+
+.gpu-control-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.gpu-control-buttons .button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    border: none;
+}
+
+.gpu-control-buttons .button.primary {
+    background-color: var(--primary);
+    color: var(--on-primary);
+}
+
+.gpu-control-buttons .button.primary:hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gpu-control-buttons .button.danger {
+    background-color: var(--error);
+    color: var(--on-error);
+}
+
+.gpu-control-buttons .button.danger:hover {
+    background-color: var(--error-hover);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gpu-control-buttons .button.secondary {
+    background-color: var(--secondary);
+    color: var(--on-secondary);
+}
+
+.gpu-control-buttons .button.secondary:hover {
+    background-color: var(--secondary-hover);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gpu-control-buttons .button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.gpu-status {
+    padding: 16px;
+    background-color: var(--surface-variant);
+    border-radius: 8px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#gpu-status-value {
+    font-weight: 500;
+}
+
+#gpu-status-value.status-running {
+    color: var(--success);
+}
+
+#gpu-status-value.status-stopped {
+    color: var(--error);
+}
+
+#gpu-status-value.status-error {
+    color: var(--error);
+}
+
+#gpu-status-value.status-unknown {
+    color: var(--warning);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .gpu-control-buttons {
+        flex-direction: column;
+    }
+    
+    .gpu-control-buttons .button {
+        width: 100%;
+    }
+    
+    .config-editor {
+        min-height: 200px;
+    }
+}
