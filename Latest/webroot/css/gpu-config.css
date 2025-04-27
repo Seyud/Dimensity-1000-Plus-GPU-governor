@@ -208,13 +208,33 @@
     background-color: var(--surface-variant);
 }
 
-.freq-volt-table select {
+.freq-volt-table select,
+.freq-volt-table input {
     padding: 8px;
     border: 1px solid var(--outline);
     border-radius: 4px;
     background-color: var(--surface);
     color: var(--on-surface);
     min-width: 120px;
+}
+
+.freq-volt-table .input-container {
+    position: relative;
+    display: inline-block;
+}
+
+.freq-volt-table .freq-input {
+    padding-right: 40px; /* 为单位留出空间 */
+}
+
+.freq-volt-table .input-unit {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 14px;
+    pointer-events: none;
 }
 
 .table-actions {
@@ -372,6 +392,24 @@ input:checked + .slider:before {
     border-radius: 16px;
     font-size: 12px;
     font-family: monospace;
+}
+
+.recommended-chips {
+    margin-top: 8px;
+}
+
+.recommended-chip {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.recommended-chip:hover {
+    background-color: var(--primary-container);
+    color: var(--on-primary-container);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .gpu-control-buttons {

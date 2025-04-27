@@ -142,11 +142,16 @@ const I18n = {
             CONFIG_HELP: '配置帮助',
             CONFIG_FORMAT: '配置格式',
             CONFIG_FORMAT_DESC: '每行一个配置项，格式为：Freq Volt DDR_OPP',
-            FREQ_LIST: '可用频率列表',
+            FREQ_LIST: '推荐频率列表',
+            FREQ_LIST_DESC: '以下频率值是经过验证的稳定且有价值的频率，推荐优先使用',
+            FREQ_RANGE: '频率范围',
+            FREQ_RANGE_DESC: '您可以输入218000到853000之间的任意频率值（单位：KHz），步进值为1000',
+            FREQ_APPLIED: '已应用频率值: {0} KHz',
+            SELECT_ROW_FIRST: '请先选择一行再点击推荐频率',
             VOLT_LIST: '可用电压列表',
             DDR_OPP_LIST: 'DDR_OPP值说明',
             DDR_OPP_NOTE: '降低/限制内存频率能略微降低功耗，但GPU性能会严重受损',
-            NO_FREQ_LIST: '无法获取频率列表',
+            NO_FREQ_LIST: '无法获取推荐频率列表',
             NO_VOLT_LIST: '无法获取电压列表',
             GPU_CONTROL_TITLE: 'GPU调速器控制',
             GPU_STATUS: '状态',
@@ -278,11 +283,16 @@ const I18n = {
             CONFIG_HELP: 'Configuration Help',
             CONFIG_FORMAT: 'Configuration Format',
             CONFIG_FORMAT_DESC: 'One configuration item per line, format: Freq Volt DDR_OPP',
-            FREQ_LIST: 'Available Frequency List',
+            FREQ_LIST: 'Recommended Frequency List',
+            FREQ_LIST_DESC: 'The following frequency values are verified stable and valuable frequencies, recommended to use',
+            FREQ_RANGE: 'Frequency Range',
+            FREQ_RANGE_DESC: 'You can input any frequency value between 218000 and 853000 (unit: KHz), with a step value of 1000',
+            FREQ_APPLIED: 'Applied frequency value: {0} KHz',
+            SELECT_ROW_FIRST: 'Please select a row first before clicking on a recommended frequency',
             VOLT_LIST: 'Available Voltage List',
             DDR_OPP_LIST: 'DDR_OPP Values',
             DDR_OPP_NOTE: 'Lowering/limiting memory frequency can slightly reduce power consumption, but GPU performance will be severely affected',
-            NO_FREQ_LIST: 'Unable to get frequency list',
+            NO_FREQ_LIST: 'Unable to get recommended frequency list',
             NO_VOLT_LIST: 'Unable to get voltage list',
             GPU_CONTROL_TITLE: 'GPU Governor Control',
             GPU_STATUS: 'Status',
@@ -414,11 +424,16 @@ const I18n = {
             CONFIG_HELP: 'Справка по конфигурации',
             CONFIG_FORMAT: 'Формат конфигурации',
             CONFIG_FORMAT_DESC: 'Один элемент конфигурации на строку, формат: Freq Volt DDR_OPP',
-            FREQ_LIST: 'Доступные частоты',
+            FREQ_LIST: 'Рекомендуемые частоты',
+            FREQ_LIST_DESC: 'Следующие значения частот являются проверенными стабильными и ценными частотами, рекомендуется использовать',
+            FREQ_RANGE: 'Диапазон частот',
+            FREQ_RANGE_DESC: 'Вы можете ввести любое значение частоты от 218000 до 853000 (единица: КГц), с шагом 1000',
+            FREQ_APPLIED: 'Применено значение частоты: {0} КГц',
+            SELECT_ROW_FIRST: 'Пожалуйста, сначала выберите строку, прежде чем нажимать на рекомендуемую частоту',
             VOLT_LIST: 'Доступные напряжения',
             DDR_OPP_LIST: 'Значения DDR_OPP',
             DDR_OPP_NOTE: 'Понижение/ограничение частоты памяти может немного снизить энергопотребление, но производительность GPU будет сильно снижена',
-            NO_FREQ_LIST: 'Не удалось получить список частот',
+            NO_FREQ_LIST: 'Не удалось получить список рекомендуемых частот',
             NO_VOLT_LIST: 'Не удалось получить список напряжений',
             GPU_CONTROL_TITLE: 'Управление GPU регулятором',
             GPU_STATUS: 'Статус',
@@ -506,9 +521,11 @@ const I18n = {
     translate(key, defaultText = '') {
         if (!key) return defaultText;
 
-        // 支持参数替换，例如：translate('HELLO', '你好 {name}', {name: '张三'})
+        // 获取翻译文本
+        let text = this.translations[this.currentLang][key] || defaultText || key;
+
+        // 支持对象参数替换，例如：translate('HELLO', '你好 {name}', {name: '张三'})
         if (arguments.length > 2 && typeof arguments[2] === 'object') {
-            let text = this.translations[this.currentLang][key] || defaultText || key;
             const params = arguments[2];
 
             for (const param in params) {
@@ -520,7 +537,16 @@ const I18n = {
             return text;
         }
 
-        return this.translations[this.currentLang][key] || defaultText || key;
+        // 支持位置参数替换，例如：translate('FREQ_APPLIED', null, '853000')
+        if (arguments.length > 2) {
+            // 从第二个参数开始，替换 {0}, {1}, {2} 等占位符
+            for (let i = 2; i < arguments.length; i++) {
+                const paramValue = arguments[i];
+                text = text.replace(new RegExp(`\\{${i-2}\\}`, 'g'), paramValue);
+            }
+        }
+
+        return text;
     },
 
     initLanguageSelector() {

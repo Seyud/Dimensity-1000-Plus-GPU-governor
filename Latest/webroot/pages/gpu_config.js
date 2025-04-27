@@ -196,25 +196,45 @@ margin=${this.parsedConfig.margin}${this.parsedConfig.marginType === 'mhz' ? 'MH
 
                     // 频率单元格
                     const freqTd = document.createElement('td');
-                    const freqSelect = document.createElement('select');
-                    freqSelect.className = 'freq-select';
-                    freqSelect.dataset.index = index;
+                    const freqInput = document.createElement('input');
+                    freqInput.type = 'number';
+                    freqInput.className = 'freq-input';
+                    freqInput.dataset.index = index;
+                    freqInput.min = 218000;
+                    freqInput.max = 853000;
+                    freqInput.step = 1000; // 设置步进值为1000
+                    freqInput.value = row.freq;
+                    freqInput.placeholder = '218000-853000';
 
-                    this.freqList.forEach(freq => {
-                        const option = document.createElement('option');
-                        option.value = freq;
-                        option.textContent = `${freq} KHz`;
-                        option.selected = freq === row.freq;
-                        freqSelect.appendChild(option);
-                    });
-
-                    freqSelect.addEventListener('change', (e) => {
+                    // 添加输入验证和事件处理
+                    freqInput.addEventListener('change', (e) => {
                         const idx = parseInt(e.target.dataset.index);
-                        this.parsedConfig.freqVoltTable[idx].freq = e.target.value;
+                        let value = parseInt(e.target.value);
+
+                        // 验证输入范围
+                        if (isNaN(value)) value = 218000;
+                        if (value < 218000) value = 218000;
+                        if (value > 853000) value = 853000;
+
+                        // 确保值是1000的倍数
+                        value = Math.round(value / 1000) * 1000;
+
+                        e.target.value = value;
+                        this.parsedConfig.freqVoltTable[idx].freq = value.toString();
                         this.updateConfigEditor();
                     });
 
-                    freqTd.appendChild(freqSelect);
+                    // 添加单位标签
+                    const freqUnit = document.createElement('span');
+                    freqUnit.className = 'input-unit';
+                    freqUnit.textContent = 'KHz';
+
+                    const freqInputContainer = document.createElement('div');
+                    freqInputContainer.className = 'input-container';
+                    freqInputContainer.appendChild(freqInput);
+                    freqInputContainer.appendChild(freqUnit);
+
+                    freqTd.appendChild(freqInputContainer);
                     tr.appendChild(freqTd);
 
                     // 电压单元格
@@ -329,14 +349,14 @@ margin=${this.parsedConfig.margin}${this.parsedConfig.marginType === 'mhz' ? 'MH
     // 添加新的频率/电压/DDR_OPP配置行
     addFreqVoltRow() {
         try {
-            // 获取最后一行的配置
+            // 获取最后一行的配置或使用默认值
             let lastFreq = '218000';
             let lastVolt = '43750';
             let lastDdrOpp = '999';
 
             if (this.parsedConfig.freqVoltTable.length > 0) {
                 const lastRow = this.parsedConfig.freqVoltTable[this.parsedConfig.freqVoltTable.length - 1];
-                lastFreq = lastRow.freq;
+                // 使用最小频率值作为默认值，而不是复制最后一行的频率
                 lastVolt = lastRow.volt;
                 lastDdrOpp = lastRow.ddrOpp;
             }
@@ -531,7 +551,11 @@ margin=${this.parsedConfig.margin}${this.parsedConfig.marginType === 'mhz' ? 'MH
                                 <h3 data-i18n="CONFIG_FORMAT">配置格式</h3>
                                 <p data-i18n="CONFIG_FORMAT_DESC">每行一个配置项，格式为：Freq Volt DDR_OPP</p>
 
-                                <h3 data-i18n="FREQ_LIST">可用频率列表</h3>
+                                <h3 data-i18n="FREQ_RANGE">频率范围</h3>
+                                <p data-i18n="FREQ_RANGE_DESC">您可以输入218000到853000之间的任意频率值（单位：KHz），步进值为1000</p>
+
+                                <h3 data-i18n="FREQ_LIST">推荐频率列表</h3>
+                                <p data-i18n="FREQ_LIST_DESC">以下频率值是经过验证的稳定且有价值的频率，推荐优先使用：</p>
                                 <div class="freq-list">${this.renderFreqList()}</div>
 
                                 <h3 data-i18n="VOLT_LIST">可用电压列表</h3>
@@ -583,11 +607,11 @@ margin=${this.parsedConfig.margin}${this.parsedConfig.marginType === 'mhz' ? 'MH
     // 渲染频率列表
     renderFreqList() {
         if (!this.freqList || this.freqList.length === 0) {
-            return '<p data-i18n="NO_FREQ_LIST">无法获取频率列表</p>';
+            return '<p data-i18n="NO_FREQ_LIST">无法获取推荐频率列表</p>';
         }
 
-        return `<div class="chip-container">
-            ${this.freqList.map(freq => `<div class="chip">${freq}</div>`).join('')}
+        return `<div class="chip-container recommended-chips">
+            ${this.freqList.map(freq => `<div class="chip recommended-chip" title="点击使用此频率值" data-value="${freq}">${freq}</div>`).join('')}
         </div>`;
     },
 
@@ -984,6 +1008,31 @@ margin=7
 
         // 更新卡片选择状态
         this.updateCardSelection();
+
+        // 绑定推荐频率点击事件
+        document.querySelectorAll('.recommended-chip').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                const freqValue = e.currentTarget.dataset.value;
+
+                // 查找当前活动的频率输入框
+                const activeRow = document.querySelector('.freq-volt-table tr:focus-within');
+                if (activeRow) {
+                    const freqInput = activeRow.querySelector('.freq-input');
+                    if (freqInput) {
+                        freqInput.value = freqValue;
+                        // 触发change事件以更新配置
+                        const event = new Event('change', { bubbles: true });
+                        freqInput.dispatchEvent(event);
+
+                        // 显示提示
+                        Core.showToast(I18n.translate('FREQ_APPLIED', freqValue));
+                    }
+                } else {
+                    // 如果没有选中的行，提示用户
+                    Core.showToast(I18n.translate('SELECT_ROW_FIRST', '请先选择一行再点击推荐频率'), 'info');
+                }
+            });
+        });
 
         // 更新GPU状态
         this.updateGpuStatus();
