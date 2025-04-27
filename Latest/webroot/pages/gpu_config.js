@@ -25,6 +25,7 @@ const GpuConfigPage = {
     parsedConfig: {
         governor: 'hybrid',
         margin: '7',
+        marginType: 'percent', // 'percent' 或 'mhz'
         freqVoltTable: []
     },
 
@@ -70,6 +71,7 @@ const GpuConfigPage = {
             this.parsedConfig = {
                 governor: 'hybrid',
                 margin: '7',
+                marginType: 'percent',
                 freqVoltTable: []
             };
 
@@ -93,9 +95,20 @@ const GpuConfigPage = {
 
                 // 解析margin配置
                 if (line.includes('margin=')) {
-                    const match = line.match(/margin=(\d+)/);
-                    if (match && match[1]) {
-                        this.parsedConfig.margin = match[1];
+                    // 检查是否包含MHz单位
+                    if (line.includes('MHz')) {
+                        const match = line.match(/margin=(\d+)MHz/);
+                        if (match && match[1]) {
+                            this.parsedConfig.margin = match[1];
+                            this.parsedConfig.marginType = 'mhz';
+                        }
+                    } else {
+                        // 不包含MHz单位，视为百分比
+                        const match = line.match(/margin=(\d+)/);
+                        if (match && match[1]) {
+                            this.parsedConfig.margin = match[1];
+                            this.parsedConfig.marginType = 'percent';
+                        }
                     }
                     continue;
                 }
@@ -143,7 +156,7 @@ governor=${this.parsedConfig.governor}
 # 配置项：余量(%) 或 余量(MHz)
 # 可配置为 0~100 代表GPU空闲比例，数值越大升频越激进
 # 或配置为0MHz~800MHz 代表以MHz为单位的固定性能余量
-margin=${this.parsedConfig.margin}
+margin=${this.parsedConfig.margin}${this.parsedConfig.marginType === 'mhz' ? 'MHz' : ''}
 
 # 以下为频率/电压表配置内容
 # 请务必将频率/电压值以从低到高的顺序配置`;
@@ -430,12 +443,34 @@ margin=${this.parsedConfig.margin}
                             <div class="config-section">
                                 <div class="config-section-title" data-i18n="MARGIN_SETTING">余量设置</div>
                                 <div class="margin-setting">
+                                    <div class="margin-type-selector">
+                                        <div class="margin-type-label" data-i18n="MARGIN_TYPE">余量类型</div>
+                                        <div class="margin-type-options">
+                                            <label class="margin-type-option">
+                                                <input type="radio" name="margin-type" value="percent" ${this.parsedConfig.marginType === 'percent' ? 'checked' : ''}>
+                                                <span data-i18n="MARGIN_TYPE_PERCENT">百分比 (%)</span>
+                                            </label>
+                                            <label class="margin-type-option">
+                                                <input type="radio" name="margin-type" value="mhz" ${this.parsedConfig.marginType === 'mhz' ? 'checked' : ''}>
+                                                <span data-i18n="MARGIN_TYPE_MHZ">频率 (MHz)</span>
+                                            </label>
+                                        </div>
+                                    </div>
                                     <div class="input-field">
                                         <label for="margin-input" data-i18n="MARGIN_VALUE">余量值</label>
-                                        <input type="number" id="margin-input" min="0" max="100" value="${this.parsedConfig.margin}">
+                                        <input type="number" id="margin-input"
+                                            min="0"
+                                            max="${this.parsedConfig.marginType === 'percent' ? '100' : '800'}"
+                                            value="${this.parsedConfig.margin}">
+                                        <span class="input-unit">${this.parsedConfig.marginType === 'percent' ? '%' : 'MHz'}</span>
                                     </div>
                                     <div class="margin-description">
-                                        <p data-i18n="MARGIN_DESC">可配置为 0~100 代表GPU空闲比例，数值越大升频越激进；或配置为0MHz~800MHz 代表以MHz为单位的固定性能余量</p>
+                                        <p data-i18n="MARGIN_DESC_PERCENT" style="display: ${this.parsedConfig.marginType === 'percent' ? 'block' : 'none'}">
+                                            百分比模式：0~100 代表GPU空闲比例，数值越大升频越激进
+                                        </p>
+                                        <p data-i18n="MARGIN_DESC_MHZ" style="display: ${this.parsedConfig.marginType === 'mhz' ? 'block' : 'none'}">
+                                            频率模式：0MHz~800MHz 代表以MHz为单位的固定性能余量
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -481,6 +516,18 @@ margin=${this.parsedConfig.margin}
                                 <span data-i18n="CONFIG_HELP">配置帮助</span>
                             </div>
                             <div class="config-help-content">
+                                <h3 data-i18n="GOVERNOR_MODE_HELP">调速模式说明</h3>
+                                <ul>
+                                    <li><strong>hybrid</strong>: 混合模式，在性能需求较低时暂停辅助调速器以降低功耗（默认推荐）</li>
+                                    <li><strong>simple</strong>: 简单模式，仅使用gpu_freq_table.conf中定义的频率</li>
+                                </ul>
+
+                                <h3 data-i18n="MARGIN_HELP">余量设置说明</h3>
+                                <ul>
+                                    <li><strong>百分比模式 (%)</strong>: 0~100 代表GPU空闲比例，数值越大升频越激进</li>
+                                    <li><strong>频率模式 (MHz)</strong>: 0MHz~800MHz 代表以MHz为单位的固定性能余量</li>
+                                </ul>
+
                                 <h3 data-i18n="CONFIG_FORMAT">配置格式</h3>
                                 <p data-i18n="CONFIG_FORMAT_DESC">每行一个配置项，格式为：Freq Volt DDR_OPP</p>
 
@@ -867,11 +914,59 @@ margin=7
             });
         });
 
+        // 绑定余量类型选择事件
+        const marginTypeRadios = document.querySelectorAll('input[name="margin-type"]');
+        if (marginTypeRadios.length > 0) {
+            marginTypeRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const newType = e.target.value;
+                    this.parsedConfig.marginType = newType;
+
+                    // 更新输入框最大值和单位显示
+                    const marginInput = document.getElementById('margin-input');
+                    const inputUnit = document.querySelector('.input-unit');
+                    const percentDesc = document.querySelector('[data-i18n="MARGIN_DESC_PERCENT"]');
+                    const mhzDesc = document.querySelector('[data-i18n="MARGIN_DESC_MHZ"]');
+
+                    if (marginInput) {
+                        marginInput.max = newType === 'percent' ? '100' : '800';
+
+                        // 如果当前值超出新范围，调整为最大值
+                        if (parseInt(marginInput.value) > parseInt(marginInput.max)) {
+                            marginInput.value = marginInput.max;
+                            this.parsedConfig.margin = marginInput.value;
+                        }
+                    }
+
+                    if (inputUnit) {
+                        inputUnit.textContent = newType === 'percent' ? '%' : 'MHz';
+                    }
+
+                    if (percentDesc && mhzDesc) {
+                        percentDesc.style.display = newType === 'percent' ? 'block' : 'none';
+                        mhzDesc.style.display = newType === 'mhz' ? 'block' : 'none';
+                    }
+
+                    // 更新配置编辑器
+                    this.updateConfigEditor();
+                });
+            });
+        }
+
         // 绑定余量输入框事件
         const marginInput = document.getElementById('margin-input');
         if (marginInput) {
             marginInput.addEventListener('change', (e) => {
-                this.parsedConfig.margin = e.target.value;
+                // 确保值在有效范围内
+                const max = this.parsedConfig.marginType === 'percent' ? 100 : 800;
+                let value = parseInt(e.target.value);
+
+                if (isNaN(value)) value = 0;
+                if (value < 0) value = 0;
+                if (value > max) value = max;
+
+                e.target.value = value;
+                this.parsedConfig.margin = value.toString();
                 this.updateConfigEditor();
             });
         }

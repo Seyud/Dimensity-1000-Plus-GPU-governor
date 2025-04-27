@@ -118,14 +118,41 @@
 .margin-setting {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
     margin-bottom: 16px;
+}
+
+.margin-type-selector {
+    margin-bottom: 8px;
+}
+
+.margin-type-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.margin-type-options {
+    display: flex;
+    gap: 16px;
+}
+
+.margin-type-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.margin-type-option input {
+    margin-right: 8px;
 }
 
 .input-field {
     display: flex;
     flex-direction: column;
     max-width: 200px;
+    position: relative;
 }
 
 .input-field label {
@@ -136,10 +163,19 @@
 
 .input-field input {
     padding: 8px 12px;
+    padding-right: 36px; /* 为单位留出空间 */
     border: 1px solid var(--outline);
     border-radius: 4px;
     background-color: var(--surface);
     color: var(--on-surface);
+}
+
+.input-unit {
+    position: absolute;
+    right: 12px;
+    bottom: 8px;
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
 .margin-description {
@@ -266,6 +302,7 @@ input:checked + .slider:before {
     border: 1px solid var(--divider);
     border-radius: 8px;
     overflow: hidden;
+    margin-top: 24px;
     margin-bottom: 24px;
 }
 
@@ -284,11 +321,13 @@ input:checked + .slider:before {
 }
 
 .config-help-content h3 {
-    margin-top: 16px;
-    margin-bottom: 8px;
+    margin-top: 20px;
+    margin-bottom: 12px;
     font-size: 16px;
     font-weight: 500;
     color: var(--primary);
+    border-bottom: 1px solid var(--divider);
+    padding-bottom: 6px;
 }
 
 .config-help-content h3:first-child {
@@ -304,12 +343,18 @@ input:checked + .slider:before {
 .config-help-content ul {
     margin-bottom: 16px;
     padding-left: 24px;
+    list-style-type: disc;
 }
 
 .config-help-content li {
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     font-size: 14px;
     line-height: 1.5;
+}
+
+.config-help-content strong {
+    color: var(--primary);
+    font-weight: 500;
 }
 
 .chip-container {
