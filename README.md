@@ -210,3 +210,7 @@ A：检查WebUI服务是否启动：`ps -ef | grep webui`，如未启动可尝�
 
 **Q：如何在WebUI中修改GPU配置？**
 A：在WebUI中点击"GPU配置"选项卡，可以使用卡片模式或文本模式编辑配置
+
+## 🙏 感谢
+
+[AMMF2](https://github.com/Aurora-Nasa-1/AMMF2)
