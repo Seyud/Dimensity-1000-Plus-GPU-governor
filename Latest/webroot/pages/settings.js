@@ -125,21 +125,11 @@ const SettingsPage = {
             // 布尔值设置
             ENABLE_FEATURE_A: true,
             ENABLE_FEATURE_B: false,
-            
-            // 数字设置
-            SERVER_PORT: 8080,
-            
-            // 文本设置
-            API_KEY: "test_api_key_12345",
-            
+
             // 选择项设置
             LOG_LEVEL: "info",
             THEME: "auto",
-            
-            // 数字滑条设置
-            VOLUME: 75,
-            BRIGHTNESS: 80,
-            
+
             // 添加测试排除项
             APP_TEST_1: "should_be_excluded",
             APP_TEST_2: "should_be_excluded",
@@ -394,14 +384,10 @@ const SettingsPage = {
         this.settingsDescriptions = {
             ENABLE_FEATURE_A: { zh: "启用功能A", en: "Enable Feature A" },
             ENABLE_FEATURE_B: { zh: "启用功能B", en: "Enable Feature B" },
-            SERVER_PORT: { zh: "服务器端口", en: "Server Port" },
-            API_KEY: { zh: "API密钥", en: "API Key" },
             LOG_LEVEL: { zh: "日志级别", en: "Log Level" },
-            THEME: { zh: "主题", en: "Theme" },
-            VOLUME: { zh: "音量", en: "Volume" },
-            BRIGHTNESS: { zh: "亮度", en: "Brightness" }
+            THEME: { zh: "主题", en: "Theme" }
         };
-    
+
         // 设置选项配置
         this.settingsOptions = {
             LOG_LEVEL: {
@@ -420,7 +406,7 @@ const SettingsPage = {
                 ]
             }
         };
-    
+
         // 添加测试排除规则
         this.excludedSettings = [
             "APP_*",      // 排除所有以APP_开头的设置项
