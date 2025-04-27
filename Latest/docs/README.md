@@ -50,12 +50,25 @@
 governor=hybrid
 ```
 
+#### 性能余量（margin）
+```
+# 配置项：性能余量
+# 可配置为百分比(%)或固定频率(MHz)
+# 百分比模式示例：margin=7%
+# 固定频率模式示例：margin=50MHz
+margin=7%
+```
+
 #### 频率/电压表
-Freq Volt DDR_OPP
+```
+# 格式: Freq Volt DDR_OPP
+# 频率范围: 218000-853000 MHz
+# DDR_OPP: 999(自动) 0-4(固定内存频率)
 218000 43750 999
 280000 46875 999
 ...
 853000 60625 0
+```
 
 ### 调参建议
 1. 花屏问题：降低当前电压档位的频率
@@ -76,12 +89,12 @@ G --> H[应用新电压]
 ## 🖥️ 控制面板
 提供两种控制界面，满足不同使用需求：
 
-### 操作控制面板
+### 命令行控制面板
 ```
 sh /data/adb/modules/dimensity_hybrid_governor/action.sh
 ```
 
-#### WebUI控制面板功能
+#### 命令行控制面板功能
 - 显示GPU调度器当前状态（运行/停止）
 - 一键切换GPU调度器开关
 - 快速查看最近日志
@@ -91,12 +104,20 @@ sh /data/adb/modules/dimensity_hybrid_governor/action.sh
 通过KsuWebUI软件访问模块提供的WebUI界面，支持更丰富的功能：
 
 #### WebUI功能
-- 查看模块和设备状态
-- 查看和管理日志
-- 启动/停止GPU调速器
-- 编辑GPU调速器配置文件
-- 实时监控GPU调速器状态
+- 查看模块和设备状态（运行状态、设备信息）
+- 查看和管理日志（自动刷新、导出、清空）
+- 启动/停止/重启GPU调速器
+- 编辑GPU调速器配置（卡片模式/文本模式）
 - 多语言支持（中文、英文、俄语）
+- 深色/浅色主题切换
+
+#### GPU配置页面特性
+- 卡片式配置界面，直观易用
+- 支持选择调速模式（hybrid/simple）
+- 支持选择余量类型（百分比/MHz）
+- 提供推荐频率列表
+- 支持自定义频率/电压/DDR_OPP配置
+- 实时配置预览和保存
 
 #### 访问WebUI
 在浏览器中访问：`http://127.0.0.1:9999`
@@ -156,7 +177,7 @@ A：使用WebUI界面、命令行控制面板或直接执行：`sh /data/adb/mod
 A：删除`/data/gpu_freq_table.conf`后重启
 
 **Q：如何切换调速模式？**
-A：编辑`/data/gpu_freq_table.conf`文件，修改`governor=hybrid`为`governor=simple`或反之，然后重启设备
+A：在WebUI的GPU配置页面中选择调速模式，或编辑`/data/gpu_freq_table.conf`文件，修改`governor=hybrid`为`governor=simple`或反之，然后重启设备
 
 **Q：支持其他SOC吗？**
 A：仅限天玑1000+（mt6885/mt6889）
@@ -165,7 +186,7 @@ A：仅限天玑1000+（mt6885/mt6889）
 A：尝试提高margin值或检查DDR_OPP设置
 
 **Q：日志文件过大怎么办？**
-A：可以清空日志文件：`echo "" > /data/adb/modules/dimensity_hybrid_governor/logs/gpu-scheduler.log`，或者通过WebUI查看和管理日志
+A：可以通过WebUI日志页面清空日志，或执行命令：`echo "" > /data/adb/modules/dimensity_hybrid_governor/logs/gpu-scheduler.log`
 
 **Q：控制面板无法启动怎么办？**
 A：检查文件权限：`chmod 755 /data/adb/modules/dimensity_hybrid_governor/action.sh`
@@ -174,4 +195,4 @@ A：检查文件权限：`chmod 755 /data/adb/modules/dimensity_hybrid_governor/
 A：检查WebUI服务是否启动：`ps -ef | grep webui`，如未启动可尝试重启模块
 
 **Q：如何在WebUI中修改GPU配置？**
-A：在WebUI中点击"GPU配置"选项卡，可以直接编辑配置文件并保存
+A：在WebUI中点击"GPU配置"选项卡，可以使用卡片模式或文本模式编辑配置
