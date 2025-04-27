@@ -101,7 +101,7 @@ sh /data/adb/modules/dimensity_hybrid_governor/action.sh
 - 集成日志管理功能
 
 ### WebUI界面
-通过KsuWebUI软件访问模块提供的WebUI界面，支持更丰富的功能：
+通过WebUI访问模块提供的图形界面，支持更丰富的功能：
 
 #### WebUI功能
 - 查看模块和设备状态（运行状态、设备信息）
@@ -120,8 +120,23 @@ sh /data/adb/modules/dimensity_hybrid_governor/action.sh
 - 实时配置预览和保存
 
 #### 访问WebUI
-在浏览器中访问：`http://127.0.0.1:9999`
-或使用ADB命令：`adb shell am start -a android.intent.action.VIEW -d http://127.0.0.1:9999`
+本模块的WebUI可通过以下方式访问：
+
+**方法一：使用KsuWebUI（推荐）**
+1. 从 [GitHub](https://github.com/5ec1cff/KsuWebUIStandalone) 下载并安装 KsuWebUI 应用
+2. 打开KsuWebUI应用
+3. 在模块列表中找到并点击"Dimensity Hybrid Governor"
+4. WebUI将在应用内打开
+
+**方法二：使用MMRL**
+1. 从 [GitHub](https://github.com/MMRLApp/MMRL) 下载并安装 MMRL 应用
+2. 打开MMRL应用
+3. 在已安装模块列表中找到"Dimensity Hybrid Governor"
+4. 点击模块，然后点击"打开WebUI"按钮
+
+**方法三：直接访问**
+- 在浏览器中访问：`http://127.0.0.1:9999`
+- 或使用ADB命令：`adb shell am start -a android.intent.action.VIEW -d http://127.0.0.1:9999`
 
 ## 📝 日志管理系统
 完善的日志管理系统，提供以下功能：
