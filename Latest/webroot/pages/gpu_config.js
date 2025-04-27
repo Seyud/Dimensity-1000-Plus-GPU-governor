@@ -1,6 +1,7 @@
 /**
  * GPU配置页面模块
  * 用于查看和编辑GPU调速器配置文件
+ * 支持卡片选择和文本编辑两种配置方式
  */
 
 const GpuConfigPage = {
@@ -17,6 +18,32 @@ const GpuConfigPage = {
     freqList: [],
     voltList: [],
 
+    // 当前配置模式：card(卡片) 或 text(文本)
+    configMode: 'card',
+
+    // 解析后的配置项
+    parsedConfig: {
+        governor: 'hybrid',
+        margin: '7',
+        freqVoltTable: []
+    },
+
+    // DDR_OPP选项
+    ddrOppOptions: [
+        { value: '999', label: '自动' },
+        { value: '0', label: '725000uv 3733000KHz' },
+        { value: '1', label: '725000uv 3200000KHz' },
+        { value: '2', label: '650000uv 3200000KHz' },
+        { value: '3', label: '650000uv 2400000KHz' },
+        { value: '4', label: '600000uv 2400000KHz' }
+    ],
+
+    // 调速模式选项
+    governorOptions: [
+        { value: 'hybrid', label: '混合模式' },
+        { value: 'simple', label: '简单模式' }
+    ],
+
     // 初始化
     async init() {
         try {
@@ -26,10 +53,326 @@ const GpuConfigPage = {
             // 加载频率和电压列表
             await this.loadFreqVoltLists();
 
+            // 解析配置文件
+            this.parseConfigFile();
+
             return true;
         } catch (error) {
             console.error('初始化GPU配置页面失败:', error);
             return false;
+        }
+    },
+
+    // 解析配置文件内容
+    parseConfigFile() {
+        try {
+            // 重置解析结果
+            this.parsedConfig = {
+                governor: 'hybrid',
+                margin: '7',
+                freqVoltTable: []
+            };
+
+            // 按行解析配置文件
+            const lines = this.configContent.split('\n');
+
+            for (const line of lines) {
+                // 跳过空行和注释行
+                if (!line.trim() || line.trim().startsWith('#')) {
+                    continue;
+                }
+
+                // 解析governor配置
+                if (line.includes('governor=')) {
+                    const match = line.match(/governor=(\w+)/);
+                    if (match && match[1]) {
+                        this.parsedConfig.governor = match[1];
+                    }
+                    continue;
+                }
+
+                // 解析margin配置
+                if (line.includes('margin=')) {
+                    const match = line.match(/margin=(\d+)/);
+                    if (match && match[1]) {
+                        this.parsedConfig.margin = match[1];
+                    }
+                    continue;
+                }
+
+                // 解析频率/电压/DDR_OPP配置行
+                const parts = line.trim().split(/\s+/);
+                if (parts.length >= 3 && /^\d+$/.test(parts[0]) && /^\d+$/.test(parts[1])) {
+                    this.parsedConfig.freqVoltTable.push({
+                        freq: parts[0],
+                        volt: parts[1],
+                        ddrOpp: parts[2] || '999'
+                    });
+                }
+            }
+
+            // 按频率排序
+            this.parsedConfig.freqVoltTable.sort((a, b) => parseInt(a.freq) - parseInt(b.freq));
+
+            console.log('解析配置文件成功:', this.parsedConfig);
+        } catch (error) {
+            console.error('解析配置文件失败:', error);
+        }
+    },
+
+    // 从卡片界面生成配置文件内容
+    generateConfigFromCards() {
+        try {
+            // 生成配置文件头部注释
+            let config = `# GPU频率/电压配置文件
+# 格式: Freq Volt DDR_OPP
+# DDR_OPP 用于固定内存频率，常用值：
+# 999 : 自动
+# 0 : 固定 725000uv 3733000KHz
+# 1 : 固定 725000uv 3200000KHz
+# 2 : 固定 650000uv 3200000KHz
+# 3 : 固定 650000uv 2400000KHz
+# 4 : 固定 600000uv 2400000KHz
+
+# 配置项：调速模式
+# 可配置为 hybrid simple , 默认 hybrid
+# simple 仅使用gpu_freq_table.conf中定义的频率
+# hybrid 在性能需求较低时暂停辅助调速器以降低功耗
+governor=${this.parsedConfig.governor}
+
+# 配置项：余量(%) 或 余量(MHz)
+# 可配置为 0~100 代表GPU空闲比例，数值越大升频越激进
+# 或配置为0MHz~800MHz 代表以MHz为单位的固定性能余量
+margin=${this.parsedConfig.margin}
+
+# 以下为频率/电压表配置内容
+# 请务必将频率/电压值以从低到高的顺序配置`;
+
+            // 添加频率/电压/DDR_OPP配置行
+            for (const row of this.parsedConfig.freqVoltTable) {
+                config += `\n${row.freq} ${row.volt} ${row.ddrOpp}`;
+            }
+
+            return config;
+        } catch (error) {
+            console.error('生成配置文件内容失败:', error);
+            return this.getDefaultConfig();
+        }
+    },
+
+    // 更新卡片选择状态
+    updateCardSelection() {
+        try {
+            // 更新调速模式选择
+            document.querySelectorAll('.governor-card').forEach(card => {
+                const value = card.dataset.value;
+                if (value === this.parsedConfig.governor) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+
+            // 更新频率/电压/DDR_OPP表格
+            const tableBody = document.getElementById('freq-volt-table-body');
+            if (tableBody) {
+                tableBody.innerHTML = '';
+
+                this.parsedConfig.freqVoltTable.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+
+                    // 频率单元格
+                    const freqTd = document.createElement('td');
+                    const freqSelect = document.createElement('select');
+                    freqSelect.className = 'freq-select';
+                    freqSelect.dataset.index = index;
+
+                    this.freqList.forEach(freq => {
+                        const option = document.createElement('option');
+                        option.value = freq;
+                        option.textContent = `${freq} KHz`;
+                        option.selected = freq === row.freq;
+                        freqSelect.appendChild(option);
+                    });
+
+                    freqSelect.addEventListener('change', (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        this.parsedConfig.freqVoltTable[idx].freq = e.target.value;
+                        this.updateConfigEditor();
+                    });
+
+                    freqTd.appendChild(freqSelect);
+                    tr.appendChild(freqTd);
+
+                    // 电压单元格
+                    const voltTd = document.createElement('td');
+                    const voltSelect = document.createElement('select');
+                    voltSelect.className = 'volt-select';
+                    voltSelect.dataset.index = index;
+
+                    this.voltList.forEach(volt => {
+                        const option = document.createElement('option');
+                        option.value = volt;
+                        option.textContent = `${volt} μV`;
+                        option.selected = volt === row.volt;
+                        voltSelect.appendChild(option);
+                    });
+
+                    voltSelect.addEventListener('change', (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        this.parsedConfig.freqVoltTable[idx].volt = e.target.value;
+                        this.updateConfigEditor();
+                    });
+
+                    voltTd.appendChild(voltSelect);
+                    tr.appendChild(voltTd);
+
+                    // DDR_OPP单元格
+                    const ddrTd = document.createElement('td');
+                    const ddrSelect = document.createElement('select');
+                    ddrSelect.className = 'ddr-select';
+                    ddrSelect.dataset.index = index;
+
+                    this.ddrOppOptions.forEach(option => {
+                        const opt = document.createElement('option');
+                        opt.value = option.value;
+                        opt.textContent = option.label;
+                        opt.selected = option.value === row.ddrOpp;
+                        ddrSelect.appendChild(opt);
+                    });
+
+                    ddrSelect.addEventListener('change', (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        this.parsedConfig.freqVoltTable[idx].ddrOpp = e.target.value;
+                        this.updateConfigEditor();
+                    });
+
+                    ddrTd.appendChild(ddrSelect);
+                    tr.appendChild(ddrTd);
+
+                    // 操作单元格
+                    const actionTd = document.createElement('td');
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'icon-button small';
+                    deleteBtn.innerHTML = '<span class="material-symbols-rounded">delete</span>';
+                    deleteBtn.dataset.index = index;
+
+                    deleteBtn.addEventListener('click', (e) => {
+                        const idx = parseInt(e.target.closest('button').dataset.index);
+                        this.parsedConfig.freqVoltTable.splice(idx, 1);
+                        this.updateCardSelection();
+                        this.updateConfigEditor();
+                    });
+
+                    actionTd.appendChild(deleteBtn);
+                    tr.appendChild(actionTd);
+
+                    tableBody.appendChild(tr);
+                });
+            }
+
+            // 更新余量设置
+            const marginInput = document.getElementById('margin-input');
+            if (marginInput) {
+                marginInput.value = this.parsedConfig.margin;
+            }
+        } catch (error) {
+            console.error('更新卡片选择状态失败:', error);
+        }
+    },
+
+    // 更新配置编辑器内容
+    updateConfigEditor() {
+        try {
+            const editor = document.getElementById('config-editor');
+            if (editor) {
+                // 从卡片界面生成配置文件内容
+                const newConfig = this.generateConfigFromCards();
+
+                // 更新编辑器内容
+                editor.value = newConfig;
+
+                // 更新配置内容变量
+                this.configContent = newConfig;
+            }
+        } catch (error) {
+            console.error('更新配置编辑器内容失败:', error);
+        }
+    },
+
+    // 从编辑器更新卡片界面
+    updateCardsFromEditor() {
+        try {
+            // 解析配置文件
+            this.parseConfigFile();
+
+            // 更新卡片选择状态
+            this.updateCardSelection();
+        } catch (error) {
+            console.error('从编辑器更新卡片界面失败:', error);
+        }
+    },
+
+    // 添加新的频率/电压/DDR_OPP配置行
+    addFreqVoltRow() {
+        try {
+            // 获取最后一行的配置
+            let lastFreq = '218000';
+            let lastVolt = '43750';
+            let lastDdrOpp = '999';
+
+            if (this.parsedConfig.freqVoltTable.length > 0) {
+                const lastRow = this.parsedConfig.freqVoltTable[this.parsedConfig.freqVoltTable.length - 1];
+                lastFreq = lastRow.freq;
+                lastVolt = lastRow.volt;
+                lastDdrOpp = lastRow.ddrOpp;
+            }
+
+            // 添加新行
+            this.parsedConfig.freqVoltTable.push({
+                freq: lastFreq,
+                volt: lastVolt,
+                ddrOpp: lastDdrOpp
+            });
+
+            // 更新界面
+            this.updateCardSelection();
+            this.updateConfigEditor();
+        } catch (error) {
+            console.error('添加新的频率/电压/DDR_OPP配置行失败:', error);
+        }
+    },
+
+    // 切换配置模式
+    toggleConfigMode() {
+        try {
+            // 切换模式
+            this.configMode = this.configMode === 'card' ? 'text' : 'card';
+
+            // 更新界面
+            const cardContainer = document.getElementById('card-config-container');
+            const editorContainer = document.getElementById('config-editor-container');
+            const modeSwitch = document.getElementById('config-mode-switch');
+
+            if (cardContainer && editorContainer && modeSwitch) {
+                if (this.configMode === 'card') {
+                    cardContainer.style.display = 'block';
+                    editorContainer.style.display = 'none';
+                    modeSwitch.checked = false;
+
+                    // 从编辑器更新卡片界面
+                    this.updateCardsFromEditor();
+                } else {
+                    cardContainer.style.display = 'none';
+                    editorContainer.style.display = 'block';
+                    modeSwitch.checked = true;
+
+                    // 从卡片界面更新编辑器
+                    this.updateConfigEditor();
+                }
+            }
+        } catch (error) {
+            console.error('切换配置模式失败:', error);
         }
     },
 
@@ -54,15 +397,81 @@ const GpuConfigPage = {
                 <div class="card">
                     <div class="card-header">
                         <h2 data-i18n="GPU_CONFIG_TITLE">GPU调速器配置</h2>
+                        <div class="config-mode-switch">
+                            <span class="switch-label" data-i18n="CONFIG_MODE_CARD">卡片模式</span>
+                            <label class="switch">
+                                <input type="checkbox" id="config-mode-switch">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="switch-label" data-i18n="CONFIG_MODE_TEXT">文本模式</span>
+                        </div>
                     </div>
                     <div class="card-content">
                         <div class="config-description">
                             <p data-i18n="GPU_CONFIG_DESC">配置文件位于 ${this.configPath}，修改后需要保存并重启调速器才能生效。</p>
                         </div>
 
-                        <div class="config-editor-container">
+                        <!-- 卡片配置界面 -->
+                        <div id="card-config-container" class="card-config-container" style="display: ${this.configMode === 'card' ? 'block' : 'none'}">
+                            <!-- 调速模式选择 -->
+                            <div class="config-section">
+                                <div class="config-section-title" data-i18n="GOVERNOR_MODE">调速模式</div>
+                                <div class="config-cards">
+                                    ${this.governorOptions.map(option => `
+                                        <div class="config-card governor-card ${this.parsedConfig.governor === option.value ? 'selected' : ''}" data-value="${option.value}">
+                                            <div class="config-card-value">${option.value}</div>
+                                            <div class="config-card-label">${option.label}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- 余量设置 -->
+                            <div class="config-section">
+                                <div class="config-section-title" data-i18n="MARGIN_SETTING">余量设置</div>
+                                <div class="margin-setting">
+                                    <div class="input-field">
+                                        <label for="margin-input" data-i18n="MARGIN_VALUE">余量值</label>
+                                        <input type="number" id="margin-input" min="0" max="100" value="${this.parsedConfig.margin}">
+                                    </div>
+                                    <div class="margin-description">
+                                        <p data-i18n="MARGIN_DESC">可配置为 0~100 代表GPU空闲比例，数值越大升频越激进；或配置为0MHz~800MHz 代表以MHz为单位的固定性能余量</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 频率/电压表 -->
+                            <div class="config-section">
+                                <div class="config-section-title" data-i18n="FREQ_VOLT_TABLE">频率/电压表</div>
+                                <div class="freq-volt-table-container">
+                                    <table class="freq-volt-table">
+                                        <thead>
+                                            <tr>
+                                                <th data-i18n="FREQ">频率</th>
+                                                <th data-i18n="VOLT">电压</th>
+                                                <th data-i18n="DDR_OPP">DDR_OPP</th>
+                                                <th data-i18n="ACTION">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="freq-volt-table-body">
+                                            <!-- 动态生成的表格行 -->
+                                        </tbody>
+                                    </table>
+                                    <div class="table-actions">
+                                        <button id="add-freq-volt-row" class="button secondary">
+                                            <span class="material-symbols-rounded">add</span>
+                                            <span data-i18n="ADD_ROW">添加行</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 文本编辑器界面 -->
+                        <div id="config-editor-container" class="config-editor-container" style="display: ${this.configMode === 'text' ? 'block' : 'none'}">
                             <div class="config-editor-header">
                                 <span data-i18n="CONFIG_EDITOR">配置编辑器</span>
+                                <button id="update-from-editor" class="button small" data-i18n="UPDATE_CARDS">更新卡片</button>
                             </div>
                             <textarea id="config-editor" class="config-editor" rows="15">${this.configContent}</textarea>
                         </div>
@@ -404,6 +813,9 @@ margin=7
         const startButton = document.getElementById('start-gpu');
         const stopButton = document.getElementById('stop-gpu');
         const restartButton = document.getElementById('restart-gpu');
+        const addRowButton = document.getElementById('add-freq-volt-row');
+        const updateFromEditorButton = document.getElementById('update-from-editor');
+        const configModeSwitch = document.getElementById('config-mode-switch');
 
         if (refreshButton) {
             refreshButton.addEventListener('click', () => this.refreshConfig());
@@ -425,11 +837,58 @@ margin=7
             restartButton.addEventListener('click', () => this.restartGpu());
         }
 
+        if (addRowButton) {
+            addRowButton.addEventListener('click', () => this.addFreqVoltRow());
+        }
+
+        if (updateFromEditorButton) {
+            updateFromEditorButton.addEventListener('click', () => this.updateCardsFromEditor());
+        }
+
+        if (configModeSwitch) {
+            configModeSwitch.checked = this.configMode === 'text';
+            configModeSwitch.addEventListener('change', () => this.toggleConfigMode());
+        }
+
+        // 绑定调速模式卡片点击事件
+        document.querySelectorAll('.governor-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const value = e.currentTarget.dataset.value;
+                this.parsedConfig.governor = value;
+
+                // 更新选中状态
+                document.querySelectorAll('.governor-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                e.currentTarget.classList.add('selected');
+
+                // 更新配置编辑器
+                this.updateConfigEditor();
+            });
+        });
+
+        // 绑定余量输入框事件
+        const marginInput = document.getElementById('margin-input');
+        if (marginInput) {
+            marginInput.addEventListener('change', (e) => {
+                this.parsedConfig.margin = e.target.value;
+                this.updateConfigEditor();
+            });
+        }
+
         // 更新编辑器内容
         const editor = document.getElementById('config-editor');
         if (editor) {
             editor.value = this.configContent;
+
+            // 监听编辑器内容变化
+            editor.addEventListener('input', () => {
+                this.configContent = editor.value;
+            });
         }
+
+        // 更新卡片选择状态
+        this.updateCardSelection();
 
         // 更新GPU状态
         this.updateGpuStatus();
