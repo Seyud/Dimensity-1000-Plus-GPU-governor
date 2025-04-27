@@ -258,7 +258,7 @@ const AboutPage = {
                 id: 'dimensity_hybrid_governor',
                 name: '天玑GPU混合调速器1000+',
                 version: 'v1.5.1',
-                versionCode: '20250427',
+                versionCode: '20250428',
                 author: '酷安@瓦力喀',
                 description: '适用于Mediatek Dimensity 1000+的GPU辅助调速器，改善在高画质游戏中的功耗和性能表现'
             };
