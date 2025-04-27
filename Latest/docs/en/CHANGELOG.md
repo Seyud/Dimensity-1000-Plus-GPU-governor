@@ -1,6 +1,6 @@
 # 🎮 Dimensity GPU Hybrid Governor Changelog
 
-## 🚀 Version 1.5.0 → 1.5.1 (2025-04-27)
+## 🚀 Version 1.5.0 → 1.5.1 (2025-04-28)
 
 ### 🔧 Improvements
 - 🌐 Comprehensive optimization of WebUI interface, enhancing user experience
