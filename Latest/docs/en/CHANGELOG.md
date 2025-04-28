@@ -30,10 +30,10 @@
 - 🎮 Launch control panel: `sh /data/adb/modules/dimensity_hybrid_governor/action.sh`
 - 🔄 Switch scheduler state: `sh /data/adb/modules/dimensity_hybrid_governor/action.sh switch`
 - 📊 View scheduler status: `sh /data/adb/modules/dimensity_hybrid_governor/action.sh status`
-- 🌐 Access WebUI interface: Visit `http://127.0.0.1:9999` in browser
+- 🌐 Access WebUI interface: Through KsuWebUI or MMRL apps
 
 ### ⚠️ Upgrade Notes
 - This version mainly optimizes the WebUI interface and fixes issues
 - Configuration file format remains compatible, no modifications needed
 - Control panel commands remain compatible
-- It is recommended to clear browser cache before accessing WebUI to ensure getting the latest interface
+- It is recommended to reopen KsuWebUI or MMRL app before accessing WebUI to ensure getting the latest interface

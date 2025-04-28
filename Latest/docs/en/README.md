@@ -135,9 +135,7 @@ The module's WebUI can be accessed through the following methods:
 3. Find "Dimensity Hybrid Governor" in the installed modules list
 4. Click on the module, then click the "Open WebUI" button
 
-**Method 3: Direct Access**
-- In browser, visit: `http://127.0.0.1:9999`
-- Or use ADB command: `adb shell am start -a android.intent.action.VIEW -d http://127.0.0.1:9999`
+
 
 ## 📝 Log Management System
 Comprehensive log management system with the following features:
@@ -208,7 +206,7 @@ A: Clear logs through the WebUI logs page, or execute the command: `echo "" > /d
 A: Check file permissions: `chmod 755 /data/adb/modules/dimensity_hybrid_governor/action.sh`
 
 **Q: What if WebUI is inaccessible?**
-A: Check if the WebUI service is running: `ps -ef | grep webui`, if not started, try restarting the module
+A: WebUI can only be accessed through KsuWebUI or MMRL apps, direct browser access is not supported. Please make sure you have installed the appropriate app.
 
 **Q: How to modify GPU configuration in WebUI?**
 A: Click on the "GPU Configuration" tab in WebUI, you can edit the configuration using card mode or text mode

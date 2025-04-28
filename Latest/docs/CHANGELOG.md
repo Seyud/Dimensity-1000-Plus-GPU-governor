@@ -31,11 +31,11 @@
 - 🎮 启动控制面板: `sh /data/adb/modules/dimensity_hybrid_governor/action.sh`
 - 🔄 切换调度器状态: `sh /data/adb/modules/dimensity_hybrid_governor/action.sh switch`
 - 📊 查看调度器状态: `sh /data/adb/modules/dimensity_hybrid_governor/action.sh status`
-- 🌐 访问WebUI界面: 浏览器访问 `http://127.0.0.1:9999`
+- 🌐 访问WebUI界面: 通过KsuWebUI或MMRL应用访问
 
 ### ⚠️ 升级注意事项
 - 此版本主要优化WebUI界面和修复问题
 - 配置文件格式保持兼容，无需修改
 - 控制面板命令保持兼容
-- 建议清除浏览器缓存后再访问WebUI，以确保获取最新界面
+- 建议重新打开KsuWebUI或MMRL应用后再访问WebUI，以确保获取最新界面
 

@@ -134,9 +134,7 @@ sh /data/adb/modules/dimensity_hybrid_governor/action.sh
 3. 在已安装模块列表中找到"Dimensity Hybrid Governor"
 4. 点击模块，然后点击"打开WebUI"按钮
 
-**方法三：直接访问**
-- 在浏览器中访问：`http://127.0.0.1:9999`
-- 或使用ADB命令：`adb shell am start -a android.intent.action.VIEW -d http://127.0.0.1:9999`
+
 
 ## 📝 日志管理系统
 完善的日志管理系统，提供以下功能：
@@ -207,7 +205,7 @@ A：可以通过WebUI日志页面清空日志，或执行命令：`echo "" > /da
 A：检查文件权限：`chmod 755 /data/adb/modules/dimensity_hybrid_governor/action.sh`
 
 **Q：WebUI无法访问怎么办？**
-A：检查WebUI服务是否启动：`ps -ef | grep webui`，如未启动可尝试重启模块
+A：WebUI需要通过KsuWebUI或MMRL应用访问，不支持直接通过浏览器访问。请确保已安装相应的应用。
 
 **Q：如何在WebUI中修改GPU配置？**
 A：在WebUI中点击"GPU配置"选项卡，可以使用卡片模式或文本模式编辑配置
