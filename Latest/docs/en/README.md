@@ -4,7 +4,6 @@
 [![Magisk](https://img.shields.io/badge/Magisk-20.4%2B-brightgreen)](https://github.com/topjohnwu/Magisk)
 ![Platform](https://img.shields.io/badge/Platform-Android%2010.0%2B-blue)
 ![SOC](https://img.shields.io/badge/SOC-MediaTek_Dimensity_1000%2B-red)
-![Version](https://img.shields.io/badge/Version-1.5.0-orange)
 ![Framework](https://img.shields.io/badge/Framework-AMMF2-purple)
 
 A GPU dynamic governor for MediaTek Dimensity 1000+, optimizing power and performance balance in high-load scenarios

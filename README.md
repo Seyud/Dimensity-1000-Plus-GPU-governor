@@ -3,7 +3,6 @@
 [![Magisk](https://img.shields.io/badge/Magisk-20.4%2B-brightgreen)](https://github.com/topjohnwu/Magisk)
 ![Platform](https://img.shields.io/badge/Platform-Android%2010.0%2B-blue)
 ![SOC](https://img.shields.io/badge/SOC-MediaTek_Dimensity_1000%2B-red)
-![Version](https://img.shields.io/badge/Version-1.5.0-orange)
 ![Framework](https://img.shields.io/badge/Framework-AMMF2-purple)
 
 适用于联发科天玑1000+的GPU动态调速器，优化高负载场景下的功耗与性能平衡
@@ -211,3 +210,7 @@ A：检查WebUI服务是否启动：`ps -ef | grep webui`，如未启动可尝�
 
 **Q：如何在WebUI中修改GPU配置？**
 A：在WebUI中点击"GPU配置"选项卡，可以使用卡片模式或文本模式编辑配置
+
+## 🙏 感谢
+
+[AMMF2](https://github.com/Aurora-Nasa-1/AMMF2)
