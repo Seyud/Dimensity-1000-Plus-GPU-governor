@@ -1,5 +1,19 @@
 # 🎮 天玑GPU混合调速器 - Gaming版本 🎮
 
+# ⚠️⚠️⚠️ 重要提示 ⚠️⚠️⚠️
+
+<div align="center">
+<h1 style="color:red; font-size:30px;">⚠️ 警告：此分支已废弃 ⚠️</h1>
+
+<h2>⚠️ 游戏模式已迁移至新仓库 ⚠️</h2>
+
+<h2><a href="https://github.com/Seyud/Mediatek_Mali_GPU_Governor">https://github.com/Seyud/Mediatek_Mali_GPU_Governor</a></h2>
+
+<h3>⚠️ 当前文档以下内容全部作废 ⚠️</h3>
+</div>
+
+---
+
 [![Magisk](https://img.shields.io/badge/Magisk-20.4%2B-brightgreen)](https://github.com/topjohnwu/Magisk)
 ![Platform](https://img.shields.io/badge/Platform-Android%2010.0%2B-blue)
 ![SOC](https://img.shields.io/badge/SOC-MediaTek_Dimensity_1000%2B-red)
