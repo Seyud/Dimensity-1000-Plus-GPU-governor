@@ -1,6 +1,6 @@
 {
-"versionCode": 20250428,
-"version": "v1.5.1",
-"zipUrl": "https://github.com/Seyud/Dimensity-1000-Plus-GPU-governor/releases/download/v1.5.1/dimensity_hybrid_governor-1000.1.5.1.version.zip",
-"changelog": "https://github.com/Seyud/Dimensity-1000-Plus-GPU-governor/blob/main/Latest/docs/CHANGELOG.md"
+"versionCode": 20250429,
+"version": "v2.0",
+"zipUrl": "https://github.com/Seyud/Mediatek_Mali_GPU_Governor/releases/download/v2.0/Mediatek_Mali_GPU_Governor.zip",
+"changelog": "https://github.com/Seyud/Mediatek_Mali_GPU_Governor/blob/main/docs/CHANGELOG.md"
 }
